@@ -1,0 +1,18 @@
+/* Build file hello-spark */
+plugins {
+id 'java'
+}
+repositories {
+mavenCentral()
+}
+dependencies {
+// Use the SparkJava web server framework
+implementation group: 'com.sparkjava', name: 'spark-core',
+version: '2.9.3'
+}
+task hello(type: JavaExec) {
+group 'SWEA'
+description 'Dependency management demonstration'
+main = 'example.HelloSpark'
+classpath = sourceSets.main.runtimeClasspath
+}

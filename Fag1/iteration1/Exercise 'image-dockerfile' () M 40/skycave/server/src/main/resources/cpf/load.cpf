@@ -1,0 +1,9 @@
+# Setting up daemon for a load generation scenario, i.e.
+# the server accepts ALL usernames and credentials
+# Based upon the http version.
+
+< cpf/http.cpf
+
+# === Configure for SubscriptionService for a Null Object
+SKYCAVE_SUBSCRIPTIONSERVICE_CONNECTOR_IMPLEMENTATION = cloud.cave.doubles.NullSubscriptionService
+

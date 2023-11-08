@@ -1,0 +1,9 @@
+# Setting everything for socket based connection on 
+# LocalHost with (mostly) test doubles
+
+# === Configure for socket communication on client side
+SKYCAVE_CLIENTREQUESTHANDLER_IMPLEMENTATION = frds.broker.ipc.socket.SocketClientRequestHandler
+
+# === Configure for server to run on localhost
+SKYCAVE_APPSERVER = localhost:37123
+

@@ -1,0 +1,13 @@
+# Setting everything for HTTP/URI Tunnel based connection on 
+# LocalHost with (mostly) test doubles. Reusing that most is
+# already set correctly in socket.cpf
+
+< cpf/socket.cpf
+
+# Instead of using the default FRDS URI Tunnel SRH, we use a specialized
+# one for the cave which provides the /info path as well.
+SKYCAVE_SERVERREQUESTHANDLER_IMPLEMENTATION = cloud.cave.invoker.CaveUriTunnelServerRequestHandler
+
+# === Configure for server to run on localhost
+SKYCAVE_APPSERVER = localhost:7777
+

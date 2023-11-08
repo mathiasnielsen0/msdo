@@ -1,0 +1,28 @@
+Create a directory on your local machine for this workflow.
+$ mkdir self-contained-container && cd self-contained-container
+Create a python file that prints "Hello World" and save it as hello_world.py:
+# hello_world.py
+
+print('Hello World!')
+In the same folder, create a Dockerfile (filename Dockerfile) with the following contents:
+# Dockerfile
+
+# Use latest Python runtime as base image
+FROM python:3.6.5-alpine3.7
+
+# Set the working directory to /app and copy current dir
+WORKDIR /app
+COPY . /app
+
+# Run hello_world.py when the container launches
+CMD ["python", "hello_world.py"]
+We can use docker build -t hello-world . to build an image from a Dockerfile located in the current directory with the tag, hello-world.
+
+
+
+
+docker build -t hello-world .     //Builds an image from current directory
+docker run hello-world    //Runs container from image tag hello-world
+docker ps -a    //Lists stopped containers
+docker run -it hello-world //Runs terminal interactive
+docker run -d hello-world //runs terminal detached
