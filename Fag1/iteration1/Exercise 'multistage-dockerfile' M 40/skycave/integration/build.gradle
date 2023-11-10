@@ -1,0 +1,87 @@
+/*
+ * Copyright (c) 2015 - 2023. Henrik Bærbak Christensen, Aarhus University.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+/* Gradle build file for SkyCave.
+ *
+ * Only for integration testing.
+ *
+ */
+
+plugins {
+  id 'java'
+}
+
+repositories {
+    mavenCentral()
+}
+
+
+// === Define configurations for integration testing
+//     Source: §7 in Gradle in Action, Manning 2014, and DZone
+// and https://www.baeldung.com/gradle-source-sets
+
+sourceSets {
+    inttest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+        java {
+        }
+    }
+}
+
+configurations {
+    inttestImplementation.extendsFrom(testImplementation)
+    inttestRuntimeOnly.extendsFrom(testRuntimeOnly)
+}
+
+dependencies {
+
+  // Get access to the server and client projects
+  implementation project(':server')
+  implementation project(':client')
+
+  // Huh? the transitive dependency on broker does not show up?
+  inttestImplementation group: 'com.baerbak.maven', name: 'broker',
+      version: '3.0.3'
+
+  // Need JUnit
+  testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+  testImplementation group: 'org.hamcrest',
+      name: 'hamcrest', version: '2.2'
+
+  // Need TestContainers
+  inttestImplementation 'org.testcontainers:testcontainers:1.19.1'
+  inttestImplementation 'org.testcontainers:junit-jupiter:1.19.1'
+}
+
+task itest(type: Test) {
+    description = "Run integration tests"
+    group = "Verification"
+    testClassesDirs = sourceSets.inttest.output.classesDirs
+    classpath = sourceSets.inttest.runtimeClasspath
+}
+
+tasks.named('test') {
+    // Use JUnit Platform for unit tests.
+    useJUnitPlatform()
+}
+
+tasks.named('itest') {
+    // Use JUnit Platform for integration tests.
+    useJUnitPlatform()
+}
+

@@ -1,0 +1,12 @@
+# Setting everything for HTTP/URI Tunnel based connection on 
+# LocalHost with (mostly) test doubles. Reusing that most is
+# already set correctly in socket.cpf
+
+< cpf/socket.cpf
+
+# === Configure for HTTP communication on client and app server side
+SKYCAVE_CLIENTREQUESTHANDLER_IMPLEMENTATION = frds.broker.ipc.http.UriTunnelClientRequestHandler
+
+# === Configure for server to run on localhost
+SKYCAVE_APPSERVER = localhost:7777
+

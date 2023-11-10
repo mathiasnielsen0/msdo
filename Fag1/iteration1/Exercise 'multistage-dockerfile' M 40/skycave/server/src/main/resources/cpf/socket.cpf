@@ -1,0 +1,28 @@
+# Setting everything for socket based connection on 
+# LocalHost with (mostly) test doubles. Also acts as base CPF
+# for remote configurations of daemon.
+
+# === Configure for socket communication on server side
+SKYCAVE_SERVERREQUESTHANDLER_IMPLEMENTATION = frds.broker.ipc.socket.SocketServerRequestHandler
+
+# === Configure for server to run on localhost
+SKYCAVE_APPSERVER = localhost:37123
+
+# === Inject test doubles for all delegates (Note IP endpoints are dummies)
+
+# = Subscription service 
+SKYCAVE_SUBSCRIPTIONSERVICE_CONNECTOR_IMPLEMENTATION = cloud.cave.doubles.TestStubSubscriptionService
+SKYCAVE_SUBSCRIPTIONSERVICE_SERVER_ADDRESS = notused:42042
+
+# = Cave storage
+SKYCAVE_CAVESTORAGE_CONNECTOR_IMPLEMENTATION = cloud.cave.doubles.FakeCaveStorage
+SKYCAVE_CAVESTORAGE_SERVER_ADDRESS = notused:27017
+
+# = Quote service
+SKYCAVE_QUOTESERVICE_CONNECTOR_IMPLEMENTATION = cloud.cave.doubles.SaboteurQuoteService
+SKYCAVE_QUOTESERVICE_SERVER_ADDRESS = notused:6777
+
+# = Player Name Service - defaults to the simple in memory one which
+# operates correctly in a single server/single threaded non-loaded setting
+SKYCAVE_PLAYERNAMESERVICE_CONNECTOR_IMPLEMENTATION = cloud.cave.server.InMemoryNameService
+SKYCAVE_PLAYERNAMESERVICE_SERVER_ADDRESS = notused:11211

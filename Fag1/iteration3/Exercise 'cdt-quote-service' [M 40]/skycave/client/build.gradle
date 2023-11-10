@@ -1,0 +1,99 @@
+/*
+ * Copyright (c) 2015 - 2023. Henrik Bærbak Christensen, Aarhus University.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+/* Gradle build file for SkyCave. */
+
+plugins {
+  id 'java'
+}
+
+repositories {
+  mavenCentral()
+}
+
+// In order to compile the client module test cases, we need
+// the server module test case code compiled first as we
+// depend on some test doubles and helper methods there.
+compileTestJava.dependsOn tasks.getByPath(':server:testClasses')
+
+dependencies {
+    implementation project(':common')
+
+    // Bind the SLF4J logging framework to Log4J
+    implementation 'org.slf4j:slf4j-log4j12:1.7.36'
+
+    // FRDS.Broker library
+    implementation group: 'com.baerbak.maven',
+      name: 'broker', version: '3.0.3'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation group: 'org.hamcrest',
+      name: 'hamcrest', version: '2.2'
+
+    // To test the client code without distribution, we need to
+    // instantiate local variants of the server side abstrations
+    // Unfortunately, this also goes for the 'cmd local.cpf' client
+    // application that compiles server side code directly into the
+    // client
+    implementation project(':server')
+    // And we also want to reuse some of the test cases defined in
+    // server module which is in the test folder
+    testImplementation files(project(':server').sourceSets.test.output)
+}
+
+tasks.named('test') {
+    // Use JUnit Platform for unit tests.
+    useJUnitPlatform()
+}
+
+// --- Run commands for SkyCave
+task cmd(type: JavaExec) {
+  group 'SkyCave'
+  description 'Run the skycave cmd. Typically you set -Pcpf=(cpf) -Pid=(id) -Ppwd=(pwd)'
+
+  classpath sourceSets.main.runtimeClasspath
+  standardInput = System.in
+  mainClass = 'cloud.cave.main.CaveCmd' 
+  args cpf, id, pwd, cmdlistfile
+}
+
+// --- Testing tools
+
+// Simple Load generator - runs multiple users doing multiple calls
+// to server. The daemon MUST run its NullObject subscription service
+// to silence authentication, ala 'gradle daemon -Pcpf=load.cpf'
+task load(type: JavaExec) {
+  group 'SkyCave'
+  description 'Run a simple load generator'
+
+  classpath sourceSets.test.runtimeClasspath
+  mainClass = 'cloud.cave.manual.LoadGenerateCave'
+  args cpf, playercount, iterationcount
+}
+
+// Simple client program to 'fill the cave with rooms'. It assumes
+// an empty database. Can be used to try to detect exceptions thrown
+// by MongoDB during master-slave fail-over.
+task fill(type: JavaExec) {
+  group 'SkyCave'
+  description 'Fill the cave with lots of rooms'
+
+  classpath sourceSets.test.runtimeClasspath
+  mainClass = 'cloud.cave.manual.FillRoomStorage'
+  args cpf, id, pwd
+}
